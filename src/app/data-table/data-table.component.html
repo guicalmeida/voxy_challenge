@@ -1,4 +1,7 @@
 <div>
+  <mat-form-field [style.width]="'100%'">
+    <input matInput placeholder="Search anything..." [formControl]="search" />
+  </mat-form-field>
   <table
     mat-table
     [dataSource]="dataSource"

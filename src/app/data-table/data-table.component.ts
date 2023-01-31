@@ -5,9 +5,10 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 import { DataFields } from '../models/student-data.model';
 import { StudentInfoApiService } from '../services/student-info-api/student-info-api.service';
 import { TableDataSourceService } from '../services/table-data-source/table-data-source.service';
@@ -33,11 +34,12 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
+  total = 0;
 
   @ViewChild(MatSort)
   sort!: MatSort;
 
-  total = 0;
+  search = new FormControl();
 
   constructor(private studentInfoApiService: StudentInfoApiService) {}
 
@@ -51,7 +53,14 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.total = total;
       });
 
-    this.subscriptions.push(studentCountSub);
+    const searchSub = this.search.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe(() => {
+        this.paginator.pageIndex = 0;
+        this.loadStudentsData();
+      });
+
+    this.subscriptions.push(studentCountSub, searchSub);
   }
 
   ngAfterViewInit(): void {
@@ -63,6 +72,7 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
     const pageSub = this.paginator.page.subscribe(() => {
       this.loadStudentsData();
     });
+
     this.subscriptions.push(sortSub, pageSub);
   }
 
@@ -72,12 +82,13 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  loadStudentsData() {
+  loadStudentsData(): void {
     this.dataSource.loadStudentData(
       this.paginator.pageIndex,
       this.paginator.pageSize,
       this.sort.direction,
-      this.sort.active as DataFields
+      this.sort.active as DataFields,
+      this.search.value
     );
   }
 }
