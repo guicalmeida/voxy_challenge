@@ -6,6 +6,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { Subscription } from 'rxjs';
 import { DataFields } from '../models/student-data.model';
 import { StudentInfoApiService } from '../services/student-info-api/student-info-api.service';
@@ -33,15 +34,16 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
 
+  @ViewChild(MatSort)
+  sort!: MatSort;
+
   total = 0;
-  firstResult = 0;
-  maxResults = 10;
 
   constructor(private studentInfoApiService: StudentInfoApiService) {}
 
   ngOnInit(): void {
     this.dataSource = new TableDataSourceService(this.studentInfoApiService);
-    this.dataSource.loadStudentData(this.firstResult, this.maxResults);
+    this.dataSource.loadStudentData(0, 10);
 
     const studentCountSub = this.dataSource
       .getStudentCount()
@@ -53,10 +55,15 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    const sortSub = this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.loadStudentsData();
+    });
+
     const pageSub = this.paginator.page.subscribe(() => {
       this.loadStudentsData();
     });
-    this.subscriptions.push(pageSub);
+    this.subscriptions.push(sortSub, pageSub);
   }
 
   ngOnDestroy(): void {
@@ -68,7 +75,9 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
   loadStudentsData() {
     this.dataSource.loadStudentData(
       this.paginator.pageIndex,
-      this.paginator.pageSize
+      this.paginator.pageSize,
+      this.sort.direction,
+      this.sort.active as DataFields
     );
   }
 }
