@@ -38,13 +38,13 @@ export class TableDataSourceService implements DataSource<StudentData> {
   /**
    * method responsible for populating subjects with incoming data
    */
-  loadStudentData({
-    firstResult: pageIndex = 0,
+  loadStudentData(
+    pageIndex = 0,
     maxResults = 25,
     sort = 'asc',
-    sortBy = 'first_name',
-    searchTerm = '',
-  }: TableParams): void {
+    sortBy: DataFields = 'first_name',
+    searchTerm = ''
+  ): void {
     const firstResult = pageIndex * maxResults;
 
     const infoSub = this.studentInfoApiService

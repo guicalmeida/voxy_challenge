@@ -25,23 +25,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   total = 0;
 
+  total = 0;
   firstResult = 0;
   maxResults = 10;
-  sort = 'asc';
-  sortBy: DataFields = 'first_name';
-  search = '';
 
   constructor(private studentInfoApiService: StudentInfoApiService) {}
 
   ngOnInit(): void {
     this.dataSource = new TableDataSourceService(this.studentInfoApiService);
-    this.dataSource.loadStudentData({
-      firstResult: this.firstResult,
-      maxResults: this.maxResults,
-      searchTerm: this.search,
-      sort: this.sort,
-      sortBy: this.sortBy,
-    });
+    this.dataSource.loadStudentData(this.firstResult, this.maxResults);
 
     const studentCountSub = this.dataSource
       .getStudentCount()
