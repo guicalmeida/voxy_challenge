@@ -11,9 +11,10 @@ import { MatInputModule } from '@angular/material/input';
 
 import { AppComponent } from './app.component';
 import { DataTableComponent } from './data-table/data-table.component';
+import { PhonePipe } from './pipes/phone.pipe';
 
 @NgModule({
-  declarations: [AppComponent, DataTableComponent],
+  declarations: [AppComponent, DataTableComponent, PhonePipe],
   imports: [
     BrowserModule,
     MatTableModule,
