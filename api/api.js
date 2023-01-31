@@ -20,7 +20,13 @@ const server = http.createServer(async (req, res) => {
     const firstResultNum = Number(firstResult);
     const maxResultsNum = Number(maxResults);
 
-    let response = { studentCount: data.length, students: data };
+    //use default sort method (timSort algorithm in V8 Engine)
+    let sortedData = data.sort((a, b) => {
+      const ascending = a[sortBy] > b[sortBy] ? 1 : -1;
+      return sort === "asc" ? ascending : ascending * -1;
+    });
+
+    let response = { studentCount: sortedData.length, students: sortedData };
 
     /**
      * use firstResult index and number of results
@@ -29,7 +35,10 @@ const server = http.createServer(async (req, res) => {
     if (firstResultNum >= 0 && maxResultsNum >= 0) {
       response = {
         ...response,
-        students: data.slice(firstResultNum, firstResultNum + maxResultsNum),
+        students: sortedData.slice(
+          firstResultNum,
+          firstResultNum + maxResultsNum
+        ),
       };
     }
 
