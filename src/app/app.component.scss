@@ -6,3 +6,14 @@
     height: calc(100% - 16px);
   }
 }
+
+.message-block {
+  display: flex;
+  justify-content: center;
+  margin: 24px;
+
+  &__text {
+    margin: auto;
+    text-align: center;
+  }
+}
