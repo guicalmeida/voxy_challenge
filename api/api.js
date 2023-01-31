@@ -10,7 +10,23 @@ const server = http.createServer(async (req, res) => {
       "Access-Control-Allow-Origin": "http://localhost:4200",
     });
 
-    const response = { studentCount: data.length, students: data };
+    const { firstResult, maxResults } = parsed?.query ?? {};
+
+    const firstResultNum = Number(firstResult);
+    const maxResultsNum = Number(maxResults);
+
+    let response = { studentCount: data.length, students: data };
+
+    /**
+     * use firstResult index and number of results
+     * per page to allow server side pagination
+     */
+    if (firstResultNum >= 0 && maxResultsNum >= 0) {
+      response = {
+        ...response,
+        students: data.slice(firstResultNum, firstResultNum + maxResultsNum),
+      };
+    }
 
     res.end(JSON.stringify(response));
   } else {
