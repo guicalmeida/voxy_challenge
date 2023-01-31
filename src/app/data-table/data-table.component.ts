@@ -1,4 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 import { DataFields } from '../models/student-data.model';
 import { StudentInfoApiService } from '../services/student-info-api/student-info-api.service';
@@ -9,7 +16,7 @@ import { TableDataSourceService } from '../services/table-data-source/table-data
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
 })
-export class DataTableComponent implements OnInit, OnDestroy {
+export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
   subscriptions: Subscription[] = [];
 
   displayedColumns: string[] = [
@@ -23,7 +30,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   dataSource!: TableDataSourceService;
 
-  total = 0;
+  @ViewChild(MatPaginator)
+  paginator!: MatPaginator;
 
   total = 0;
   firstResult = 0;
@@ -44,9 +52,23 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.subscriptions.push(studentCountSub);
   }
 
+  ngAfterViewInit(): void {
+    const pageSub = this.paginator.page.subscribe(() => {
+      this.loadStudentsData();
+    });
+    this.subscriptions.push(pageSub);
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
     });
+  }
+
+  loadStudentsData() {
+    this.dataSource.loadStudentData(
+      this.paginator.pageIndex,
+      this.paginator.pageSize
+    );
   }
 }
