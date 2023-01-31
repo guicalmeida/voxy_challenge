@@ -1,7 +1,11 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, Subject, Subscription } from 'rxjs';
-import { StudentData } from 'src/app/models/student-data.model';
+import {
+  DataFields,
+  StudentData,
+  TableParams,
+} from 'src/app/models/student-data.model';
 import { StudentInfoApiService } from '../student-info-api/student-info-api.service';
 
 @Injectable({
@@ -30,9 +34,23 @@ export class TableDataSourceService implements DataSource<StudentData> {
   /**
    * method responsible for populating subjects with incoming data
    */
-  loadStudentData(): void {
+  loadStudentData({
+    firstResult: pageIndex = 0,
+    maxResults = 25,
+    sort = 'asc',
+    sortBy = 'first_name',
+    searchTerm = '',
+  }: TableParams): void {
+    const firstResult = pageIndex * maxResults;
+
     const infoSub = this.studentInfoApiService
-      .getStudentData()
+      .getStudentData({
+        firstResult,
+        maxResults,
+        sort,
+        sortBy,
+        searchTerm,
+      })
       .pipe(
         map((data) => {
           this.studentsCountSubject.next(data.studentCount);
