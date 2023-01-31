@@ -2,6 +2,8 @@ const http = require("http");
 const url = require("url");
 const data = require("./mock_data.json");
 
+const PORT = 5741;
+
 /**
  * creates array of arrays where index 0 is the
  * object id and index 1 its serialized info
