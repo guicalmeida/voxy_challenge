@@ -49,6 +49,23 @@ const server = http.createServer(async (req, res) => {
     });
 
     /**
+     * Queries the searchable dataset for the user search string,
+     * saving matched IDs in array for further data filtering
+     */
+    if (typeof searchTerm === "string" && searchTerm !== "") {
+      const filteredDataIds = [];
+
+      searchableDataSet.forEach((val) => {
+        const cleanTerm = searchTerm.trim().toLowerCase();
+        if (val[1].includes(cleanTerm)) {
+          filteredDataIds.push(val[0]);
+        }
+      });
+
+      sortedData = sortedData.filter((val) => filteredDataIds.includes(val.id));
+    }
+
+    /**
      * use firstResult index and number of results
      * per page to allow server side pagination
      */
