@@ -1,6 +1,6 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject, Subscription } from 'rxjs';
 import { StudentData } from 'src/app/models/student-data.model';
 import { StudentInfoApiService } from '../student-info-api/student-info-api.service';
 
@@ -12,6 +12,8 @@ export class TableDataSourceService implements DataSource<StudentData> {
   private studentDataSubject = new BehaviorSubject<StudentData[]>([]);
   private studentsCountSubject = new Subject<number>();
 
+  private subscriptions: Subscription[] = [];
+
   constructor(private studentInfoApiService: StudentInfoApiService) {}
 
   // default dataSource method
@@ -22,13 +24,14 @@ export class TableDataSourceService implements DataSource<StudentData> {
   disconnect(): void {
     this.studentDataSubject.complete();
     this.studentsCountSubject.complete();
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   /**
    * method responsible for populating subjects with incoming data
    */
   loadStudentData(): void {
-    this.studentInfoApiService
+    const infoSub = this.studentInfoApiService
       .getStudentData()
       .pipe(
         map((data) => {
@@ -40,5 +43,7 @@ export class TableDataSourceService implements DataSource<StudentData> {
         next: (studentData) => this.studentDataSubject.next(studentData),
         error: (error) => console.error(error),
       });
+
+    this.subscriptions.push(infoSub);
   }
 }
