@@ -5,7 +5,7 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { TableParams } from 'src/app/models/student-data.model';
 import { API_URL, StudentInfoApiService } from './student-info-api.service';
-import { mockTableArray, singleResultMock } from './table-mock';
+import { descResultMock, mockTableArray, singleResultMock } from './table-mock';
 
 /**
  * transforms object of params in string,
@@ -71,5 +71,21 @@ describe('StudentInfoApiService', () => {
     });
 
     req.flush(singleResultMock);
+  });
+
+  it('should call getStudentData with descending order and return an object with studentCount and the array of student info reversed', (done: DoneFn) => {
+    const descParams: TableParams = { ...baseParams, sort: 'desc' };
+    const descParamStr = serializeParams(descParams);
+
+    service.getStudentData(descParams).subscribe((res) => {
+      expect(res).toEqual(descResultMock);
+      done();
+    });
+    const req = httpController.expectOne({
+      method: 'GET',
+      url: `${API_URL}?${descParamStr}`,
+    });
+
+    req.flush(descResultMock);
   });
 });
