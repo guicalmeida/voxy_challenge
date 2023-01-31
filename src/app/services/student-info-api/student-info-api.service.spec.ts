@@ -8,6 +8,7 @@ import { API_URL, StudentInfoApiService } from './student-info-api.service';
 import {
   descResultMock,
   mockTableArray,
+  nonExistentMock,
   page2ResultsMock,
   singleResultMock,
 } from './table-mock';
@@ -108,5 +109,24 @@ describe('StudentInfoApiService', () => {
     });
 
     req.flush(page2ResultsMock);
+  });
+
+  it('should call getStudentData with nonexistent value and get 0 students', (done: DoneFn) => {
+    const nonExistentTermParams: TableParams = {
+      ...baseParams,
+      searchTerm: 'NONEXISTENT_VALUE',
+    };
+    const nonExistentTermParamsStr = serializeParams(nonExistentTermParams);
+
+    service.getStudentData(nonExistentTermParams).subscribe((res) => {
+      expect(res).toEqual(nonExistentMock);
+      done();
+    });
+    const req = httpController.expectOne({
+      method: 'GET',
+      url: `${API_URL}?${nonExistentTermParamsStr}`,
+    });
+
+    req.flush(nonExistentMock);
   });
 });
