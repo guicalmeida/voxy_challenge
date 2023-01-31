@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { DataFields } from '../models/student-data.model';
 import { StudentInfoApiService } from '../services/student-info-api/student-info-api.service';
 import { TableDataSourceService } from '../services/table-data-source/table-data-source.service';
@@ -8,7 +9,9 @@ import { TableDataSourceService } from '../services/table-data-source/table-data
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
 })
-export class DataTableComponent implements OnInit {
+export class DataTableComponent implements OnInit, OnDestroy {
+  subscriptions: Subscription[] = [];
+
   displayedColumns: string[] = [
     'first_name',
     'last_name',
@@ -38,6 +41,20 @@ export class DataTableComponent implements OnInit {
       searchTerm: this.search,
       sort: this.sort,
       sortBy: this.sortBy,
+    });
+
+    const studentCountSub = this.dataSource
+      .getStudentCount()
+      .subscribe((total) => {
+        this.total = total;
+      });
+
+    this.subscriptions.push(studentCountSub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => {
+      sub.unsubscribe();
     });
   }
 }

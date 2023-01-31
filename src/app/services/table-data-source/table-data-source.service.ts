@@ -20,6 +20,10 @@ export class TableDataSourceService implements DataSource<StudentData> {
 
   constructor(private studentInfoApiService: StudentInfoApiService) {}
 
+  getStudentCount() {
+    return this.studentsCountSubject.asObservable();
+  }
+
   // default dataSource method
   connect(): Observable<StudentData[]> {
     return this.studentDataSubject.asObservable();
