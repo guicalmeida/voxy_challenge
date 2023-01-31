@@ -1,4 +1,5 @@
 const http = require("http");
+const data = require("./mock_data.json");
 
 const server = http.createServer(async (req, res) => {
   const parsed = url.parse(req.url, true);
@@ -9,7 +10,9 @@ const server = http.createServer(async (req, res) => {
       "Access-Control-Allow-Origin": "http://localhost:4200",
     });
 
-    res.end("hello world");
+    const response = { studentCount: data.length, students: data };
+
+    res.end(JSON.stringify(response));
   } else {
     res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ message: "Route not found" }));
