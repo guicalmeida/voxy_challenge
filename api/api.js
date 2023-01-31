@@ -10,7 +10,12 @@ const server = http.createServer(async (req, res) => {
       "Access-Control-Allow-Origin": "http://localhost:4200",
     });
 
-    const { firstResult, maxResults } = parsed?.query ?? {};
+    const {
+      firstResult = 0,
+      maxResults = 10,
+      sort = "asc",
+      sortBy = "first_name",
+    } = parsed?.query ?? {};
 
     const firstResultNum = Number(firstResult);
     const maxResultsNum = Number(maxResults);
