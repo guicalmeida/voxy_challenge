@@ -1,6 +1,27 @@
 const http = require("http");
 const data = require("./mock_data.json");
 
+/**
+ * creates array of arrays where index 0 is the
+ * object id and index 1 its serialized info
+ */
+const searchableDataSet = data.map((info) => {
+  const finalArr = [];
+  const allValues = Object.values(info);
+
+  // push object ID and remove it from values
+  finalArr.push(allValues.shift());
+
+  // combine all info into a single low-case, spaceless string
+  const reduced = allValues.reduce(
+    (acc, currVal) => `${acc}${currVal.toString()?.toLowerCase()?.trim()}`,
+    ""
+  );
+  finalArr.push(reduced);
+
+  return finalArr;
+});
+
 const server = http.createServer(async (req, res) => {
   const parsed = url.parse(req.url, true);
 
@@ -15,6 +36,7 @@ const server = http.createServer(async (req, res) => {
       maxResults = 10,
       sort = "asc",
       sortBy = "first_name",
+      searchTerm,
     } = parsed?.query ?? {};
 
     const firstResultNum = Number(firstResult);
