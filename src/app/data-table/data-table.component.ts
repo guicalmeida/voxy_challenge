@@ -21,7 +21,7 @@ import { TableDataSourceService } from '../services/table-data-source/table-data
 export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
   subscriptions: Subscription[] = [];
 
-  displayedColumns: string[] = [
+  displayedColumns: DataFields[] = [
     'first_name',
     'last_name',
     'email',
@@ -47,12 +47,14 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource = new TableDataSourceService(this.studentInfoApiService);
     this.dataSource.loadStudentData(0, 10);
 
+    // if result length changes (as in search), update value
     const studentCountSub = this.dataSource
       .getStudentCount()
       .subscribe((total) => {
         this.total = total;
       });
 
+    // monitor input changes for real time search
     const searchSub = this.search.valueChanges
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(() => {
@@ -64,11 +66,13 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    // on sort, go to first page and reload data
     const sortSub = this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.loadStudentsData();
     });
 
+    // on paging, request with new params
     const pageSub = this.paginator.page.subscribe(() => {
       this.loadStudentsData();
     });
@@ -82,6 +86,10 @@ export class DataTableComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * requests new data from server
+   * based on parameter changes
+   */
   loadStudentsData(): void {
     this.dataSource.loadStudentData(
       this.paginator.pageIndex,

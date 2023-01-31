@@ -22,7 +22,12 @@ export class StudentInfoApiService {
     });
   }
 
-  private appendQueryParams(params: TableParams) {
+  /**
+   * creates HttpParams instance ready for http request
+   * @param params object to be converted to params
+   * @returns HttpParams instance
+   */
+  private appendQueryParams(params: TableParams): HttpParams {
     let queryParams = new HttpParams();
     Object.entries(params).forEach((param) => {
       if (param[1] || param[1] === 0) {
