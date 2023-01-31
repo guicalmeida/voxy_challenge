@@ -5,7 +5,7 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { TableParams } from 'src/app/models/student-data.model';
 import { API_URL, StudentInfoApiService } from './student-info-api.service';
-import { mockTableArray } from './table-mock';
+import { mockTableArray, singleResultMock } from './table-mock';
 
 /**
  * transforms object of params in string,
@@ -55,5 +55,21 @@ describe('StudentInfoApiService', () => {
     });
 
     req.flush(mockTableArray);
+  });
+
+  it('should call getStudentData with the search term "AbAgAeL" and return an obj with studentCount = 1 and an array with a single student', (done: DoneFn) => {
+    const newParams: TableParams = { ...baseParams, searchTerm: 'AbAgAeL' };
+    const searchParamStr = serializeParams(newParams);
+
+    service.getStudentData(newParams).subscribe((res) => {
+      expect(res).toEqual(singleResultMock);
+      done();
+    });
+    const req = httpController.expectOne({
+      method: 'GET',
+      url: `${API_URL}?${searchParamStr}`,
+    });
+
+    req.flush(singleResultMock);
   });
 });
