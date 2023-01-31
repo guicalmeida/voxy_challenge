@@ -21,3 +21,5 @@ Getting Started
 ---------------
 
 To start the project, you can start both Angular and the node server in parallel with the command `npm run start-platform`. Or, if you prefer, you can start both independently with `npm run start-app` and `npm run start-server`.
+
+You can also test it with `ng test`.
