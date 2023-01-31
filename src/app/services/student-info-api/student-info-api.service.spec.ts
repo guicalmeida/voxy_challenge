@@ -5,7 +5,12 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { TableParams } from 'src/app/models/student-data.model';
 import { API_URL, StudentInfoApiService } from './student-info-api.service';
-import { descResultMock, mockTableArray, singleResultMock } from './table-mock';
+import {
+  descResultMock,
+  mockTableArray,
+  page2ResultsMock,
+  singleResultMock,
+} from './table-mock';
 
 /**
  * transforms object of params in string,
@@ -87,5 +92,21 @@ describe('StudentInfoApiService', () => {
     });
 
     req.flush(descResultMock);
+  });
+
+  it('should call getStudentData with pagination and return the second page of the object response', (done: DoneFn) => {
+    const pageParams: TableParams = { ...baseParams, firstResult: 10 };
+    const pageParamstr = serializeParams(pageParams);
+
+    service.getStudentData(pageParams).subscribe((res) => {
+      expect(res).toEqual(page2ResultsMock);
+      done();
+    });
+    const req = httpController.expectOne({
+      method: 'GET',
+      url: `${API_URL}?${pageParamstr}`,
+    });
+
+    req.flush(page2ResultsMock);
   });
 });
