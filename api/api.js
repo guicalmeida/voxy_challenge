@@ -48,21 +48,17 @@ const server = http.createServer(async (req, res) => {
       return sort === "asc" ? ascending : ascending * -1;
     });
 
-    let response = { studentCount: sortedData.length, students: sortedData };
-
     /**
      * use firstResult index and number of results
      * per page to allow server side pagination
      */
-    if (firstResultNum >= 0 && maxResultsNum >= 0) {
-      response = {
-        ...response,
-        students: sortedData.slice(
-          firstResultNum,
-          firstResultNum + maxResultsNum
-        ),
-      };
-    }
+    const response = {
+      studentCount: sortedData.length,
+      students: sortedData.slice(
+        firstResultNum,
+        firstResultNum + maxResultsNum
+      ),
+    };
 
     res.end(JSON.stringify(response));
   } else {
